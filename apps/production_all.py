@@ -16,8 +16,9 @@ singularity run -B /lus/grand/projects/neutrino_osc_ADSP:/lus/grand/projects/neu
     source /lus/grand/projects/neutrino_osc_ADSP/software/larsoft/products/setup
     # setup sbndcode v09_24_02 -q e20:prof
     setup {{software}} {{version}} -q {{qual}}
-    # export the path the fcl files
-    export FHICL_FILE_PATH=$FHICL_FILE_PATH:{{fhicl_dir}}
+    # get the fcls
+    cp -r {{fhicl_dir}}/*.fcl .
+    # run larsoft
     lar -c {{fhicl}} --nevts {{nevts}} --output {{output}}
 EOF
 echo "Job finishing!"
