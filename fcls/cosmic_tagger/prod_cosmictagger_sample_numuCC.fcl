@@ -1,0 +1,164 @@
+#include "services_sbnd.fcl"
+#include "simulationservices_sbnd.fcl"
+#include "messages_sbnd.fcl"
+#include "rootoutput_sbnd.fcl"
+
+#include "genie_sbnd.fcl"
+#include "corsika_sbnd.fcl"
+
+#include "largeantmodules_sbnd.fcl"
+#include "mcreco.fcl"
+
+#include "detsimmodules_sbnd.fcl"
+#include "crtsimmodules_sbnd.fcl"
+#include "opdetdigitizer_sbnd.fcl"
+
+#include "caldata_sbnd.fcl"
+
+
+process_name: CosmicTaggerGenNeutrino
+
+services:
+{
+    TFileService: { fileName: "filename.root" }
+    @table::sbnd_simulation_services
+    #@table::sbnd_g4_services
+    #@table::sbnd_detsim_services
+    #@table::sbnd_services
+}
+
+source:
+{
+    module_type: EmptyEvent
+    timestampPlugin: { plugin_type: "GeneratedEventTimestamp" }
+    maxEvents: 10
+    firstRun: 1
+    firstEvent: 1
+}
+
+physics:
+{
+
+  producers:
+  {
+    rns:       { module_type: "RandomNumberSaver" }
+
+    generator: @local::sbnd_genie_simple
+    corsika:   @local::sbnd_corsika_p
+
+    largeant:  @local::sbnd_largeant
+
+    daq:       @local::sbnd_simwire
+
+    caldata:   @local::sbnd_calwire
+
+  }
+
+  analyzers:{  }
+
+  simulate: [
+      rns
+    , generator
+    , corsika
+    , largeant
+    , daq
+    , caldata
+  ]
+
+  trigger_paths: [simulate]
+  # analyze: [supera]
+  out_stream: [out1]
+  # end_paths: [analyze, out_stream]
+  # end_paths: [analyze]
+  end_paths: [out_stream]
+}
+
+
+
+
+
+#
+# Generator
+#
+physics.producers.generator.BufferBox: [ -250.0, +250.0, -250.0, +250.0, -250.0, +250.0 ]
+physics.producers.generator.FluxSearchPaths: "/grand/projects/neutrino_osc_ADSP/files/flux/sbnd/neutrino_mode/"
+physics.producers.generator.FiducialCut: "mbox: -200,-200,0,200,200,500"
+physics.producers.generator.EventGeneratorList: "CC"
+physics.producers.generator.GenFlavors: [ 14, -14]
+
+#
+# CORSIKA
+#
+physics.producers.corsika.ShowerInputFiles: [
+   "/grand/projects/neutrino_osc_ADSP/files/CORSIKA_files/p_showers_*.db"
+]
+
+
+
+#
+# Geant4
+#
+
+physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat", "volTaggerTopHigh", "volTaggerTopLow", "volTaggerSideLeft", "volTaggerSideRight", "volTaggerFaceFront", "v
+olTaggerFaceBack", "volTaggerBot"]
+
+services.LArG4Parameters.FillSimEnergyDeposits: true
+services.LArG4Parameters.KeepEMShowerDaughters: true
+services.LArG4Parameters.NoPhotonPropagation: true
+services.LArG4Parameters.ParticleKineticEnergyCut: 0.0005
+#services.LArG4Parameters.DisableWireplanes: true
+#services.LArG4Parameters.EnabledPhysics: ["Em","SynchrotronAndGN","Ion","Stopping","FastOptical"]
+#services.LArG4Parameters.EnabledPhysics: ["Em","SynchrotronAndGN","Ion","Hadron","Decay","HadronElastic","Stopping"]
+#services.LArG4Parameters.EnabledPhysics: ["Em","SynchrotronAndGN","Ion","Hadron","Decay","HadronElastic","Stopping","Optical"]
+services.LArPropertiesService.ScintYield: 0
+services.LArPropertiesService.ScintByParticleType: false
+
+
+
+
+#
+# Caldata
+#
+
+physics.producers.caldata.DigitModuleLabel: "daq"
+physics.producers.caldata.ROITool.Threshold: [19, 35 , 13]
+physics.producers.caldata.ROITool.uPlaneROIPad: [ 10, 10 ] # number of bins to pad both ends of the ROIs
+physics.producers.caldata.ROITool.vPlaneROIPad: [ 10, 10 ] # number of bins to pad both ends of the ROIs
+physics.producers.caldata.ROITool.zPlaneROIPad: [ 10, 10 ] # number of bins to pad both ends of the ROIs
+
+
+
+outputs:
+{
+ out1:
+ {
+   module_type: RootOutput
+   fileName: "sbnd-numuCC-%p-%tc.art.root"
+   dataTier: "reco"
+   compressionLevel: 1
+   # skim output (if needed)
+   #outputCommands: [ "keep *",
+   #                  "drop raw::RawDigit_*_*"
+   #                ]
+
+   # Only uncomment if selecting events with nu in active volume
+   # SelectEvents: [simulate]
+ }
+}
+
+services.message.destinations :
+{
+  STDCOUT:
+  {
+    type:      "cout"      #tells the message service to output this destination to cout
+    threshold: "INFO"      #tells the message service that this destination applies to WARNING and higher level messages
+    categories:
+    {
+      default:
+      {
+        limit:       1000  #don't print anything at the infomsg level except the explicitly named categories
+        reportEvery: 1
+      }
+    }
+  }
+}
