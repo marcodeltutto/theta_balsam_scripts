@@ -52,6 +52,8 @@ physics:
 
     caldata:   @local::sbnd_calwire
 
+    mcreco:    @local::standard_mcreco
+
   }
 
   analyzers:{  }
@@ -62,6 +64,7 @@ physics:
     , corsika
     , largeant
     , daq
+    , mcreco
     , caldata
   ]
 
@@ -91,28 +94,23 @@ physics.producers.corsika.ShowerInputFiles: [
    "/grand/projects/neutrino_osc_ADSP/files/CORSIKA_files/p_showers_*.db"
 ]
 
-
-
 #
 # Geant4
 #
 
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat", "volTaggerTopHigh", "volTaggerTopLow", "volTaggerSideLeft", "volTaggerSideRight", "volTaggerFaceFront", "v
-olTaggerFaceBack", "volTaggerBot"]
 
 services.LArG4Parameters.FillSimEnergyDeposits: true
 services.LArG4Parameters.KeepEMShowerDaughters: true
 services.LArG4Parameters.NoPhotonPropagation: true
 services.LArG4Parameters.ParticleKineticEnergyCut: 0.0005
-#services.LArG4Parameters.DisableWireplanes: true
-#services.LArG4Parameters.EnabledPhysics: ["Em","SynchrotronAndGN","Ion","Stopping","FastOptical"]
-#services.LArG4Parameters.EnabledPhysics: ["Em","SynchrotronAndGN","Ion","Hadron","Decay","HadronElastic","Stopping"]
-#services.LArG4Parameters.EnabledPhysics: ["Em","SynchrotronAndGN","Ion","Hadron","Decay","HadronElastic","Stopping","Optical"]
 services.LArPropertiesService.ScintYield: 0
 services.LArPropertiesService.ScintByParticleType: false
 
-
-
+physics.producers.mcreco.SimEnergyDepositLabel: "largeant:TPCActive"
+physics.producers.mcreco.SimChannelLabel: "largeant:TPCActive"
+physics.producers.mcreco.MCParticleLabel: "largeant"
+physics.producers.mcreco.UseSimEnergyDeposit: true
+physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,1000010020,1000010030,1000020030,1000020040]
 
 #
 # Caldata
@@ -160,3 +158,4 @@ services.message.destinations :
     }
   }
 }
+#include "1drift_services_sbnd.fcl"

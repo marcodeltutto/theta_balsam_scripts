@@ -51,6 +51,7 @@ physics:
     daq:       @local::sbnd_simwire
 
     caldata:   @local::sbnd_calwire
+    mcreco:    @local::standard_mcreco
 
   }
 
@@ -61,6 +62,7 @@ physics:
     , generator
     , corsika
     , largeant
+    , mcreco
     , daq
     , caldata
   ]
@@ -99,9 +101,6 @@ physics.producers.corsika.ShowerInputFiles: [
 # Geant4
 #
 
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat", "volTaggerTopHigh", "volTaggerTopLow", "volTaggerSideLeft", "volTaggerSideRight", "volTaggerFaceFront", "v
-olTaggerFaceBack", "volTaggerBot"]
-
 services.LArG4Parameters.FillSimEnergyDeposits: true
 services.LArG4Parameters.KeepEMShowerDaughters: true
 services.LArG4Parameters.NoPhotonPropagation: true
@@ -113,7 +112,12 @@ services.LArG4Parameters.ParticleKineticEnergyCut: 0.0005
 services.LArPropertiesService.ScintYield: 0
 services.LArPropertiesService.ScintByParticleType: false
 
-
+physics.producers.mcreco.SimEnergyDepositLabel: "largeant:TPCActive"
+physics.producers.mcreco.SimChannelLabel: "largeant:TPCActive"
+physics.producers.mcreco.MCParticleLabel: "largeant"
+physics.producers.mcreco.UseSimEnergyDeposit: true
+physics.producers.mcreco.MCRecoPart.SavePathPDGList: [13,-13,211,-211,111,311,310,130,321,-321,2212,2112,2224,2214,2114,1114,3122,1000010020,1000010030,1000020030,1000020040
+]
 
 
 #
@@ -162,3 +166,5 @@ services.message.destinations :
     }
   }
 }
+
+#include "1drift_services_sbnd.fcl"

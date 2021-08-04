@@ -98,8 +98,6 @@ physics.producers.corsika.ShowerInputFiles: [
 # Geant4
 #
 
-physics.producers.largeant.KeepParticlesInVolumes: ["volCryostat", "volTaggerTopHigh", "volTaggerTopLow", "volTaggerSideLeft", "volTaggerSideRight", "volTaggerFaceFront", "v
-olTaggerFaceBack", "volTaggerBot"]
 
 services.LArG4Parameters.FillSimEnergyDeposits: true
 services.LArG4Parameters.KeepEMShowerDaughters: true
@@ -161,3 +159,4 @@ services.message.destinations :
     }
   }
 }
+#include "1drift_services_sbnd.fcl"
