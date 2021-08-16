@@ -28,11 +28,7 @@ echo "Available files:"
 ls
 hostname
 '''
-    parameters = {
-        "software" : "sbndcode" ,
-        "version"  : "v09_27_00_02"
-        "qual"     : "e20:prof"
-    }
+    parameters = {}
     transfers = {}
 
     def preprocess(self):
@@ -49,7 +45,6 @@ hostname
 
     def handle_error(self):
         self.job.state = "FAILED"
-
 
 
 
