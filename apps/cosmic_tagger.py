@@ -14,7 +14,7 @@ class CosmicTagger(ApplicationDefinition):
 echo "Job starting!"
 date
 hostname
-singularity run -B /lus/grand/projects/neutrino_osc_ADSP:/lus/grand/projects/neutrino_osc_ADSP:rw /lus/grand/projects/neutrino_osc_ADSP/containers/fnal-wn-sl7.sing <<EOF
+singularity run -B /grand/projects/:/grand/projects/:rw /lus/grand/projects/neutrino_osc_ADSP/containers/fnal-wn-sl7.sing <<EOF
     #setup SBNDCODE:
     source /lus/grand/projects/neutrino_osc_ADSP/software/larsoft/products/setup
     # setup sbndcode v09_24_02 -q e20:prof
