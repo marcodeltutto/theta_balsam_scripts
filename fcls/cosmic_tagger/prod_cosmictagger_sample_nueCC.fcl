@@ -83,7 +83,7 @@ physics:
 # Generator
 #
 physics.producers.generator.BufferBox: [ -250.0, +250.0, -250.0, +250.0, -250.0, +250.0 ]
-physics.producers.generator.FluxSearchPaths: "/grand/projects/neutrino_osc_ADSP/files/flux/sbnd/neutrino_mode/"
+physics.producers.generator.FluxSearchPaths: "/lus/grand/projects/neutrino_osc_ADSP/files/flux/sbnd/neutrino_mode/"
 physics.producers.generator.FiducialCut: "mbox: -200,-200,0,200,200,500"
 physics.producers.generator.EventGeneratorList: "CC"
 physics.producers.generator.GenFlavors: [ 12, -12]
@@ -92,7 +92,7 @@ physics.producers.generator.GenFlavors: [ 12, -12]
 # CORSIKA
 #
 physics.producers.corsika.ShowerInputFiles: [
-   "/grand/projects/neutrino_osc_ADSP/files/CORSIKA_files/p_showers_*.db"
+   "/lus/grand/projects/neutrino_osc_ADSP/files/CORSIKA_files/p_showers_*.db"
 ]
 
 
