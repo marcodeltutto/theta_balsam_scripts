@@ -7,9 +7,8 @@ from balsam.api import Job, Site
 
 
 n_submissions = 32*1     # Number of submissions (== number of prodsingles)
-n_events = 5             # Number of events per submission
 num_nodes = 1            # Number of compute nodes required (> 1 implies MPI usage)
-node_packing_count = 48  # Maximum number of concurrent runs per node.
+node_packing_count = 32  # Maximum number of concurrent runs per node.
 extra_tag = f'{num_nodes}_node_merge_test_{node_packing_count}npc'
 fhicl_dir = "/lus/grand/projects/datascience/cadams/theta_balsam_scripts/fcls/cosmic_tagger/"
 fhicl_base = "prod_cosmictagger_sample_{sample}.fcl"
@@ -149,7 +148,7 @@ def spawn_larsoft_subsample(workflow : str, name : str, n_workgroups : int, prep
         },
         parameters  = {
             "output_file"   : f"cosmic_tagger_merged_{preproc_index}.h5",
-            "input_file_list" : " ".join(all_output_files),
+            "input_file_list" : all_output_files,
         },
         node_packing_count = node_packing_count,
         parent_ids=parent_ids
@@ -211,7 +210,7 @@ def spawn_workflow(name : str, n_workgroups : int, n_sub_workflows, workflow_ind
         },
         parameters  = {
             "output_file"   : f"cosmic_tagger_merged_{workflow_index}.h5",
-            "input_file_list" : " ".join(output_files),
+            "input_file_list" : output_files,
         },
         node_packing_count = node_packing_count,
         parent_ids=parent_ids
@@ -221,16 +220,27 @@ def spawn_workflow(name : str, n_workgroups : int, n_sub_workflows, workflow_ind
     pass
 
 # Testing configuration: just a few small pieces:
-#
+# #
+# name="dev2"
+# for i_workflow in range(2):
+#     print(f"{name} workflow {i_workflow}")
+#     spawn_workflow(name, n_workgroups=5, n_sub_workflows=5, workflow_index=i_workflow)
+
+# name="val"
+# for i_workflow in range(13):
+#     print(f"{name} workflow {i_workflow}")
+#     spawn_workflow(name, n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
+
 # name="test"
 # for i_workflow in range(26):
 #     print(f"{name} workflow {i_workflow}")
-#     spawn_workflow("test", n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
+#     spawn_workflow(name, n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
 
-name="val"
-for i_workflow in range(13):
+
+name="train"
+for i_workflow in range(134):
     print(f"{name} workflow {i_workflow}")
-    spawn_workflow("val", n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
+    spawn_workflow(name, n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
 
 # spawn_workflow("train_demo", n_workgroups=3, n_sub_workflows=4, workflow_index=1)
 
