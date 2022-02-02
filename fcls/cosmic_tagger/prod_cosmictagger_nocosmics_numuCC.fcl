@@ -5,7 +5,6 @@
 #include "emptyevent_sbnd.fcl"
 
 #include "genie_sbnd.fcl"
-#include "corsika_sbnd.fcl"
 
 #include "larg4_sbnd.fcl"
 #include "ionandscint_sbnd.fcl"
@@ -38,7 +37,6 @@ physics:
     rns: { module_type: "RandomNumberSaver" }
 
     generator: @local::sbnd_genie_simple
-    corsika:   @local::sbnd_corsika_p
 
     loader: { module_type: "PhysListLoader" }
     largeant: @local::sbnd_larg4
@@ -57,7 +55,6 @@ physics:
   simulate: [
       rns
     , generator
-    , corsika
     , loader
     , largeant
     , ionandscint
@@ -85,16 +82,11 @@ physics:
 physics.producers.generator.BufferBox: [ -250.0, +250.0, -250.0, +250.0, -250.0, +250.0 ]
 physics.producers.generator.FluxSearchPaths: "/lus/grand/projects/neutrino_osc_ADSP/files/flux/sbnd/neutrino_mode/"
 physics.producers.generator.FiducialCut: "mbox: -200,-200,0,200,200,500"
+physics.producers.generator.EventGeneratorList: "CC"
+physics.producers.generator.GenFlavors: [ 14, -14]
 physics.producers.generator.GlobalTimeOffset: 0.
 physics.producers.generator.RandomTimeOffset: 1280.
 physics.producers.generator.EventsPerSpill: 0
-
-#
-# CORSIKA
-#
-physics.producers.corsika.ShowerInputFiles: [
-   "/lus/grand/projects/neutrino_osc_ADSP/files/CORSIKA_files/p_showers_*.db"
-]
 
 
 
@@ -122,7 +114,7 @@ outputs:
  out1:
  {
    module_type: RootOutput
-   fileName: "sbnd-beam-%p-%tc.art.root"
+   fileName: "sbnd-nueCC-nocosmics-%p-%tc.art.root"
    dataTier: "reco"
    compressionLevel: 1
    # skim output (if needed)
@@ -151,4 +143,5 @@ services.message.destinations :
     }
   }
 }
+
 #include "1drift_services_sbnd.fcl"
