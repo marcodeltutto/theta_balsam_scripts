@@ -9,14 +9,16 @@
                 "sbndwire",
                 "sbnd_cosmicseg",
                 "sbndseg",
-                "sbndneutrino"
+                "sbndneutrino",
+                "bbox_neutrino"
             ],
             "StoreOnlyType": [
                 "cluster2d",
                 "sparse2d",
                 "sparse2d",
                 "particle",
-                "particle"
+                "particle",
+                "bbox2d"
             ]
         }
     },
@@ -26,15 +28,17 @@
         "DenseToSparseData",
         "DenseToSparseLabel",
         "EmbedData",
-        "EmbedLabel"
-    ], 
+        "EmbedLabel",
+        "EmbedBBox"
+    ],
     "ProcessType": [
         "ParentParticleSeg",
         "CosmicNeutrinoSegLabel",
         "DenseToSparse",
         "DenseToSparse",
         "Embed",
-        "Embed"        
+        "Embed",
+        "Embed"
     ],
     "ProcessList": {
         "ParentParticleSeg": {
@@ -78,6 +82,13 @@
             "Product"        : "tensor2d",
             "OutputProducer" : "sbnd_cosmicseg",
             "TargetSize"     : [2048,1280]
+        },
+        "EmbedBBox": {
+            "Profile"           : true,
+            "Producer"          : "bbox_neutrino",
+            "Product"           : "bbox2d",
+            "OutputProducer"    : "bbox_neutrino",
+            "TargetSize"        : [2048,1280]
         },
         "Threshold": {
             "__comment"      : "Drop very small cluster pixels",
