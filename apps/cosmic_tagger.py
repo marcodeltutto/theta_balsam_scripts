@@ -8,14 +8,11 @@ import jinja2
 import h5py
 import subprocess
 
-# echo $'#{{fcl_name}}\nphysics.bs.s: "3"' > wrapped_{{{{fcl_name}}}}
-# lar -c prodsingle_mu_bnblike.fcl --nevts {{nevts}} --output {{output}}
-# lar -c /lus/grand/projects/neutrino_osc_ADSP/software/larsoft/fcls/prodsingle_muon_sbnd.fcl --nevts {{nevts}} --output {{output}}
 class CosmicTagger(ApplicationDefinition):
     """
     Generate files for CosmicTagger
     """
-    site = "cosmic-tagger-regen"
+    site = "cosmic-tagger-feb-22"
     environment_variables = {}
     command_template = '''
 echo "Job starting!"
@@ -76,12 +73,14 @@ singularity run -B /lus/grand/projects/:/lus/grand/projects/:rw /lus/grand/proje
     source /lus/grand/projects/neutrino_osc_ADSP/software/larsoft/products/setup
     setup {software} {version} -q {qual}
 
-    setup hdf5 v1_10_5a -q e20
-    setup cmake v3_18_2
-    source /lus/grand/projects/datascience/cadams/gallery-framework/config/setup.sh
+    setup hdf5 v1_10_5a -q e20:prof
+    setup cmake v3_14_3
+
+
+    source /lus/grand/projects/neutrino_osc_ADSP/software/gallery-framework/config/setup.sh
 
     set -e
-    python /lus/grand/projects/datascience/cadams/gallery-framework/UserDev/SuperaLight/supera_sbnd.py --file {output}
+    python /lus/grand/projects/neutrino_osc_ADSP/software/gallery-framework/UserDev/SuperaLight/supera_sbnd.py --file {output}
     set +e
 EOF
 '''.format(
@@ -143,14 +142,14 @@ class Merge(ApplicationDefinition):
     """
     Application that merges files
     """
-    site = "cosmic-tagger-regen"
+    site = "cosmic-tagger-feb-22"
     environment_variables = {}
     command_template = '''
-    source /lus/grand/projects/datascience/cadams/cosmic_tagger_gen_env/bin/activate
+    source /lus/grand/projects/neutrino_osc_ADSP/software/miniconda3/bin/activate
     merge_larcv3_files.py -ol {{output_file}} -il {% for inp in input_file_list %} {{inp}} {% endfor %}
     '''
     # command_template = '''
-    # source /lus/grand/projects/datascience/cadams/cosmic_tagger_gen_env/bin/activate
+    # source /lus/grand/projects/neutrino_osc_ADSP/software/miniconda3/bin/activate
     # merge_larcv3_files.py -ol {{output_file}} -il {{input_file_list}}
     # '''
     parameters = {}
@@ -215,11 +214,12 @@ class Preprocess(ApplicationDefinition):
     """
     Application that merges files
     """
-    site = "cosmic-tagger-regen"
+    site = "cosmic-tagger-feb-22"
     environment_variables = {}
     command_template = '''
-    source /lus/grand/projects/datascience/cadams/cosmic_tagger_gen_env/bin/activate
-    run_processor.py -c {{config}} -il {% for inp in input_file_list %} {{inp}} {% endfor %} -ol {{output}}
+    module switch PrgEnv-intel/6.0.7 PrgEnv-gnu/6.0.10
+    source /lus/grand/projects/neutrino_osc_ADSP/software/miniconda3/bin/activate
+    run_processor.py -c {{config}} -il  {{input}} -ol {{output}}
     '''
     parameters = {}
     transfers = {}

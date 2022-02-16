@@ -3,30 +3,34 @@
 
 from time import time
 import argparse
-from balsam.api import Job, Site
+from balsam.api import Job, Site, _APIApp
 
-
+cosmics = True
 n_submissions = 32*1     # Number of submissions (== number of prodsingles)
 num_nodes = 1            # Number of compute nodes required (> 1 implies MPI usage)
 node_packing_count = 32  # Maximum number of concurrent runs per node.
 extra_tag = f'{num_nodes}_node_merge_test_{node_packing_count}npc'
-fhicl_dir = "/lus/grand/projects/datascience/cadams/theta_balsam_scripts/fcls/cosmic_tagger/"
-fhicl_base = "prod_cosmictagger_sample_{sample}.fcl"
+fhicl_dir = "/lus/grand/projects/neutrino_osc_ADSP/software/theta_balsam_scripts/fcls/cosmic_tagger/"
+if cosmics:
+    fhicl_base = "prod_cosmictagger_sample_{sample}.fcl"
+else:
+    fhicl_base = "prod_cosmictagger_nocosmics_{sample}.fcl"
 
 
 detector = "sbnd"
 software = "sbndcode"
-version = "v09_27_00_02"
+version = "v09_42_00"
 qual = "e20:prof"
 # prod_fcl = "run_mpvmpr_sbnd.fcl"
 
 # Figure out the site:
-site = Site.objects.filter(path="/lus/grand/projects/datascience/cadams/cosmic-tagger-regen")[0]
+site = Site.objects.filter(path="/lus/grand/projects/neutrino_osc_ADSP/cosmic-tagger-feb-22")[0]
 
 timestamp = int(time())
-ct_app = "CosmicTagger"
-merge_app = "Merge"
-preprocess_app = "Preprocess"
+ct_app = _APIApp.objects.filter(site_id=site.id, name="CosmicTagger")[0]
+merge_app = _APIApp.objects.filter(site_id=site.id, name="Merge")[0]
+preprocess_app = _APIApp.objects.filter(site_id=site.id, name="Preprocess")[0]
+
 
 # Here, we do the following for train/val/test
 # Each larsoft job generates 5 events with cosmic overlay.
@@ -82,7 +86,7 @@ def spawn_larsoft_workgroup(workflow : str, name : str, subsample_index : int, p
         out_name = f"cosmic_tagger_{sample}_{subsample_index}.root"
         job = Job(
             workdir    = f"{name}/{sample}/{subsample_index}",
-            app_id     = ct_app,
+            app_id     = ct_app.id,
             tags       = {
                 "workflow"  : workflow,
                 "sample"    : sample,
@@ -139,7 +143,7 @@ def spawn_larsoft_subsample(workflow : str, name : str, n_workgroups : int, prep
     # create a merge job for these sub samples:
     merge_job = Job(
         workdir = f"{name}/merged/",
-        app_id =merge_app,
+        app_id =merge_app.id,
         tags        = {
             "workflow"      : workflow,
             "sample"        : "merge",
@@ -159,7 +163,7 @@ def spawn_larsoft_subsample(workflow : str, name : str, n_workgroups : int, prep
     # And, create a preprocessing job:
     preproc_job = Job(
         workdir = f"{name}/preprocessed/",
-        app_id  = preprocess_app,
+        app_id  = preprocess_app.id,
         tags    = {
             "workflow"      : workflow,
             "sample"        : "preproc",
@@ -167,7 +171,7 @@ def spawn_larsoft_subsample(workflow : str, name : str, n_workgroups : int, prep
             "preproc"       : preproc_index,
         },
         parameters = {
-            "config" : "/lus/grand/projects/datascience/cadams/theta_balsam_scripts/preprocess.json",
+            "config" : "/lus/grand/projects/neutrino_osc_ADSP/software/theta_balsam_scripts/apps/preprocess.json",
             "input"  : f"cosmic_tagger_merged_{preproc_index}.h5",
             "output" : f"cosmic_tagger_merged_{preproc_index}_processed.h5"
         },
@@ -202,7 +206,7 @@ def spawn_workflow(name : str, n_workgroups : int, n_sub_workflows, workflow_ind
     # create a merge job for these sub samples:
     merge_job = Job(
         workdir = f"{name}/merged/",
-        app_id  = merge_app,
+        app_id  = merge_app.id,
         tags        = {
             "workflow"      : name,
             "sample"        : "merge",
@@ -221,10 +225,11 @@ def spawn_workflow(name : str, n_workgroups : int, n_sub_workflows, workflow_ind
 
 # Testing configuration: just a few small pieces:
 # #
-# name="dev2"
-# for i_workflow in range(2):
-#     print(f"{name} workflow {i_workflow}")
-#     spawn_workflow(name, n_workgroups=5, n_sub_workflows=5, workflow_index=i_workflow)
+name="dev"
+if cosmics: name += "_cosmics"
+for i_workflow in range(2):
+    print(f"{name} workflow {i_workflow}")
+    spawn_workflow(name, n_workgroups=5, n_sub_workflows=5, workflow_index=i_workflow)
 
 # name="val"
 # for i_workflow in range(13):
@@ -237,37 +242,9 @@ def spawn_workflow(name : str, n_workgroups : int, n_sub_workflows, workflow_ind
 #     spawn_workflow(name, n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
 
 
-name="train"
-for i_workflow in range(134):
-    print(f"{name} workflow {i_workflow}")
-    spawn_workflow(name, n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
+# name="train"
+# for i_workflow in range(134):
+#     print(f"{name} workflow {i_workflow}")
+#     spawn_workflow(name, n_workgroups=10, n_sub_workflows=25, workflow_index=i_workflow)
 
 # spawn_workflow("train_demo", n_workgroups=3, n_sub_workflows=4, workflow_index=1)
-
-
-    #
-    # # We add the beam simulation job too:
-    # job = Job(
-    #     workdir=f"prod_cosmictagger/{extra_tag}/{j}/base/",
-    #     app_id=ct_app.id,
-    #     tags={"sample":"base", 'n_submissions': n_submissions, 'n_events': n_events, 'extra': extra_tag},
-    #     parameters={
-    #         "software": software,
-    #         "version": version,
-    #         "qual": qual,
-    #         "fhicl_dir": fhicl_dir,
-    #         "fhicl": fhicl_base.format(sample="base"),
-    #         "nevts": f"{n_events}",
-    #         "output": out_name
-    #         },
-    #     node_packing_count=node_packing_count,
-    #     num_nodes=num_nodes,
-    #     parent_ids=(),
-    # )
-    # job.save()
-
-
-
-    # for i in range(n_events):
-
-    # print(job)
