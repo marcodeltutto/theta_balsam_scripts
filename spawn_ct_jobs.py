@@ -5,7 +5,7 @@ from time import time
 import argparse
 from balsam.api import Job, Site, _APIApp
 
-cosmics = True
+cosmics = False
 n_submissions = 32*1     # Number of submissions (== number of prodsingles)
 num_nodes = 1            # Number of compute nodes required (> 1 implies MPI usage)
 node_packing_count = 32  # Maximum number of concurrent runs per node.
@@ -115,7 +115,7 @@ def spawn_larsoft_subsample(workflow : str, name : str, n_workgroups : int, prep
 
     all_jobs         = []
     all_output_files = []
-    events_per_file  = 5
+    events_per_file  = 8
 
     for i in range(n_workgroups):
 
@@ -205,7 +205,7 @@ def spawn_workflow(name : str, n_workgroups : int, n_sub_workflows, workflow_ind
 
     # create a merge job for these sub samples:
     merge_job = Job(
-        workdir = f"{name}/merged/",
+        workdir = f"{name}/merged_{workflow_index}/",
         app_id  = merge_app.id,
         tags        = {
             "workflow"      : name,
