@@ -72,7 +72,7 @@
         "EmbedData": {
             "Profile"        : true,
             "Producer"       : "sbndwire",
-            "Product"        : "tensor2d",
+            "Product"        : "sparse2d",
             "OutputProducer" : "sbndwire",
             "TargetSize"     : [2048,1280]
         },
