@@ -103,6 +103,7 @@ physics.producers.corsika.ShowerInputFiles: [
 #
 services.ParticleListAction.keepEMShowerDaughters: true
 services.ParticleListAction.keepGenTrajectories: []
+services.ParticleListAction.EnergyCut: 1 # MeV
 
 
 
