@@ -10,7 +10,10 @@
                 "sbnd_cosmicseg",
                 "sbndseg",
                 "sbndneutrino",
-                "bbox_neutrino"
+                "bbox_neutrino",
+                "sbnd_cosmicseg",
+                "sbnddep3d",
+                "sbndseg"
             ],
             "StoreOnlyType": [
                 "cluster2d",
@@ -18,7 +21,10 @@
                 "sparse2d",
                 "particle",
                 "particle",
-                "bbox2d"
+                "bbox2d",
+                "sparse3d",
+                "sparse3d",
+                "cluster3d"
             ]
         }
     },
@@ -26,16 +32,26 @@
         "ParentParticleSeg",
         "CosmicNeutrinoSegLabel",
         "DenseToSparseData",
-        "DenseToSparseLabel",
+        "TensorFromCluster3D",
         "EmbedData",
         "EmbedLabel",
-        "EmbedBBox"
+        "EmbedBBox",
+        "EmbedCluster",
+        "EmbedData3D",
+        "EmbedLabel3D",
+        "EmbedBBox3D",
+        "EmbedCluster3D"
     ],
     "ProcessType": [
         "ParentParticleSeg",
         "CosmicNeutrinoSegLabel",
         "DenseToSparse",
-        "DenseToSparse",
+        "TensorFromCluster",
+        "Embed",
+        "Embed",
+        "Embed",
+        "Embed",
+        "Embed",
         "Embed",
         "Embed",
         "Embed"
@@ -53,6 +69,7 @@
             "__comment"         : "Look at particles and assign cosmic or neutrino labels into a new image",
             "Profile"           : true,
             "Cluster2dProducer" : "sbndseg",
+            "Cluster3dProducer" : "sbndseg",
             "OutputProducer"    : "sbnd_cosmicseg",
             "ParticleProducer"  : "sbndseg"
         },
@@ -61,13 +78,6 @@
             "Producer"       : "sbndwire",
             "Product"        : "image2d",
             "OutputProducer" : "sbndwire"
-        },
-        "DenseToSparseLabel": {
-            "Profile"           : true,
-            "Producer"          : "sbnd_cosmicseg",
-            "Product"           : "image2d",
-            "OutputProducer"    : "sbnd_cosmicseg",
-            "ReferenceProducer" : "sbndwire"
         },
         "EmbedData": {
             "Profile"        : true,
@@ -79,7 +89,7 @@
         "EmbedLabel": {
             "Profile"        : true,
             "Producer"       : "sbnd_cosmicseg",
-            "Product"        : "tensor2d",
+            "Product"        : "sparse2d",
             "OutputProducer" : "sbnd_cosmicseg",
             "TargetSize"     : [2048,1280]
         },
@@ -90,12 +100,45 @@
             "OutputProducer"    : "bbox_neutrino",
             "TargetSize"        : [2048,1280]
         },
-        "Threshold": {
-            "__comment"      : "Drop very small cluster pixels",
+        "EmbedCluster": {
+            "Profile"           : true,
+            "Producer"          : "sbndseg",
+            "Product"           : "cluster2d",
+            "OutputProducer"    : "sbndseg",
+            "TargetSize"        : [2048,1280]
+        },
+         "EmbedData3D": {
             "Profile"        : true,
+            "Producer"       : "sbndwire",
+            "Product"        : "sparse3d",
+            "OutputProducer" : "sbndwire",
+            "TargetSize"     : [512, 512, 512]
+        },
+        "EmbedLabel3D": {
+            "Profile"        : true,
+            "Producer"       : "sbnd_cosmicseg",
+            "Product"        : "sparse3d",
+            "OutputProducer" : "sbnd_cosmicseg",
+            "TargetSize"     : [512, 512, 512]
+        },
+        "EmbedBBox3D": {
+            "Profile"           : true,
+            "Producer"          : "bbox_neutrino",
+            "Product"           : "bbox3d",
+            "OutputProducer"    : "bbox_neutrino",
+            "TargetSize"        : [512, 512, 512]
+        },
+        "EmbedCluster3D": {
+            "Profile"           : true,
+            "Producer"          : "sbndseg",
+            "Product"           : "cluster3d",
+            "OutputProducer"    : "sbndseg",
+            "TargetSize"        : [512, 512, 512]
+        },
+        "TensorFromCluster3D": {
             "Producer"       : "sbndseg",
-            "Product"        : "cluster2d",
-            "OutputProducer" : "sbndseg"
+            "Product"        : "cluster3d",
+            "OutputProducer" : "sbnddep3d"
         }
     }
 }
